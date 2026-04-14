@@ -1,0 +1,32 @@
+Watching for changes in /home/gao/BLOG/{archetypes,assets,content,data,i18n,layouts,static,themes}
+Watching for config changes in /home/gao/BLOG/hugo.toml
+Start building sites … 
+hugo v0.145.0-666444f0a52132f9fec9f71cf25b441cc6a4f355+extended linux/amd64 BuildDate=2025-02-26T15:41:25Z VendorInfo=gohugoio
+
+
+                   | ZH  
+-------------------+-----
+  Pages            | 37  
+  Paginator pages  |  0  
+  Non-page files   |  0  
+  Static files     |  0  
+  Processed images |  0  
+  Aliases          | 12  
+  Cleaned          |  0  
+
+Built in 286 ms
+Environment: "development"
+Serving pages from disk
+Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+Web Server is available at http://192.168.100.142:1313/ (bind address 0.0.0.0) 
+Press Ctrl+C to stop
+
+Change of config file detected, rebuilding site (#1).
+2026-04-14 01:53:01.280 +0000
+Web Server is available at http://192.168.100.142:1313/ (bind address 0.0.0.0)
+Rebuilt in 387 ms
+
+Change of config file detected, rebuilding site (#2).
+2026-04-14 01:56:22.780 +0000
+Web Server is available at http://192.168.100.142:1313/ (bind address 0.0.0.0)
+Rebuilt in 409 ms
