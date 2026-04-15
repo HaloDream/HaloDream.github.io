@@ -1,4 +1,4 @@
-baseURL = "https://antjump.com/"
+baseURL = "http://antjump.com/"
 relativeURLs = true
 languageCode = "zh-CN"
 title = "SecNote"
