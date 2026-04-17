@@ -18,24 +18,33 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30          # 防止无限卡死，30分钟足够
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        # 不拉取 submodule（因为主题已作为普通文件提交）
+        with:
+          submodules: false      # 重要：如果你已将主题转为普通文件夹，这里必须 false
+          fetch-depth: 0
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: 'latest'
+          hugo-version: '0.123.7'   # 与你本地版本保持一致
           extended: true
+
       - name: Build with Hugo
-        run: hugo --minify
+        run: |
+          hugo --minify --gc --logLevel info
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './public'
+
   deploy:
     environment:
       name: github-pages

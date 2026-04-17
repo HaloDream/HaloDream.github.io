@@ -1,0 +1,11 @@
+# Hugo generated files
+public/
+resources/
+.hugo_build.lock
+
+# Theme submodule (如果已转为普通文件夹则不需要，但保留也无妨)
+# themes/
+
+# OS metadata
+.DS_Store
+Thumbs.db
