@@ -95,3 +95,9 @@ Change detected, rebuilding site (#13).
 Source changed /posts/模板.md
 Web Server is available at http://192.168.100.142:1313/ (bind address 0.0.0.0)
 Total in 884 ms
+
+Change detected, rebuilding site (#14).
+2026-04-18 08:38:16.553 +0000
+Source changed /posts/模板.md
+Web Server is available at http://192.168.100.142:1313/ (bind address 0.0.0.0)
+Total in 9 ms
