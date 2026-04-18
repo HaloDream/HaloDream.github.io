@@ -1,6 +1,6 @@
 +++
 date = '2026-04-18T16:52:15Z'
-draft = true
+draft = false
 title = 'Sqlmap教程'
 categories = ["工具手册"]
 tags = ["sqlmap", "SQL注入", "工具"]
