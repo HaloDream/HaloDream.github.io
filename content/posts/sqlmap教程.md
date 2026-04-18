@@ -1,12 +1,11 @@
 +++
 date = '2026-04-18T16:52:15Z'
 draft = false
-title = 'Sqlmap教程'
+title = 'Sqlmap ：自动化 SQL 注入测试工具'
 categories = ["工具手册"]
 tags = ["sqlmap", "SQL注入", "工具"]
 +++
 
-# Sqlmap 完全指南：自动化 SQL 注入测试工具
 
 ## 什么是 Sqlmap？
 
