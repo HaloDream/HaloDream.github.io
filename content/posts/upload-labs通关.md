@@ -7,7 +7,9 @@ tags = ["upload-labs", "文件上传", "web靶场"]
 +++
 
 # 第1关
-1.创建文件shell.php，写入一下内容：
+
+1.创建文件shell.php，写入以下内容：
+
 ```php
 <?php
 
@@ -23,13 +25,13 @@ phpinfo();
 
 上传失败，.php文件无法上传。
 
-![alt text](../images/image-7.png)
+![alt text](/images/image-7.png)
 
 打开BurpSuite抓包，上传文件发现页面依旧弹窗提示上传失败，但是BurpSuite没有抓到包，说明对文件类型的判断是在前端进行的，数据包并没有传送到服务端。
 
-![alt text](../images/image-1.png)
+![alt text](/images/image-1.png)
 
-![alt text](../images/image-7.png)
+![alt text](/images/image-7.png)
 
 3.关闭前端校验（方法一）
 
@@ -37,11 +39,11 @@ phpinfo();
 
 设置-隐私设置和安全性-网站设置-javaScript-不允许网站使用JavaScript
 
-![alt text](../images/image-2.png)
+![alt text](/images/image-2.png)
 
-![alt text](../images/image-3.png)
+![alt text](/images/image-3.png)
 
-![alt text](../images/image-4.png)
+![alt text](/images/image-4.png)
 
 4.上传shell.php并访问
 
@@ -49,9 +51,9 @@ phpinfo();
 
 文件上传成功后在图片区域点击鼠标右键，复制图片地址，打开新的标签页访问图片。
 
-![alt text](../images/image-5.png)
+![alt text](/images/image-5.png)
 
-![alt text](../images/image.png)
+![alt text](/images/image.png)
 
 可以看到php的环境配置，说明shell.php文件已经上传成功并且已被执行。
 
@@ -59,7 +61,7 @@ phpinfo();
 
 将shell.php改成shell.jpg，上传shell.jpg,BurpSuite抓包修改后缀为shell.php。
 
-![alt text](../images/image-6.png)
+![alt text](/images/image-6.png)
 
 放行数据包后，可以看到文件上传成功，接步骤4。
 
@@ -67,9 +69,9 @@ phpinfo();
 
 填写shell.php访问链接和连接密码。
 
-![alt text](../images/image-8.png)
+![alt text](/images/image-8.png)
 
-![alt text](../images/image-9.png)
+![alt text](/images/image-9.png)
 
 # 第2关
 
@@ -95,7 +97,7 @@ if (($_FILES['upload_file']['type'] == 'image/jpeg') || ($_FILES['upload_file'][
 
 改文件类型，放行数据包，前端页面可见文件上传成功。
 
-![alt text](../images/image-10.png)
+![alt text](/images/image-10.png)
 
 3.蚁剑连接
 
