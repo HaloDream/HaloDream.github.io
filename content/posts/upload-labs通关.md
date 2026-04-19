@@ -1,6 +1,6 @@
 +++
 date = '2026-04-19T13:04:50Z'
-draft = true
+draft = false
 title = 'Upload Labs通关'
 categories = ["挑战记录"]
 tags = ["upload-labs", "文件上传", "web靶场"]
