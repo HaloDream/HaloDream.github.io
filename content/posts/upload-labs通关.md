@@ -389,9 +389,9 @@ $img_path变量的值做了一个拼接，使用前端通过GET方式传来的sa
 
 简单介绍一下%00截断绕过的原理：
 
-通过源代码可以知道变量$img_path存储的是拼接的路径和新的文件名，这个变量的值是存储在内存中的，内存中使用ascii码00来表示变量值的结束位置。save_path的值是可以通过抓包修改的，如果我们把../upload/的值改成../upload/shell.php00，那么这个值传到后端，不论后端代码拼接什么内容，内存读取到00后都会停止，后面的内容就被截断了。
+通过源代码可以知道变量$img_path存储的是拼接的路径和新的文件名，这个变量的值是存储在内存中的，内存中使用十六进制的00来表示变量值的结束位置。save_path的值是可以通过抓包修改的，如果我们把../upload/的值改成../upload/shell.php00，那么这个值传到后端，不论后端代码拼接什么内容，内存读取到00后都会停止，后面的内容就被截断了。
 
-但是需要注意的是，00是ascii值，而GET传递的值是在URL中，所有ascii码00要转换成URL编码%00。
+但是需要注意的是，ascii码在内存中用十六进制00表示，，而GET传递的值是在URL中，ascii码的值要转换成URL编码，ascii码0用%00表示。
 
 最终构造的save_path值为../upload/shell.php%00
 
@@ -419,5 +419,52 @@ $img_path变量的值做了一个拼接，使用前端通过GET方式传来的sa
 
 3.中国蚁剑连接
 
+# 第13关
 
+1.分析核心源代码
+
+```php
+$ext_arr = array('jpg','png','gif');
+$file_ext = substr($_FILES['upload_file']['name'],strrpos($_FILES['upload_file']['name'],".")+1);
+if(in_array($file_ext,$ext_arr)){
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $img_path = $_POST['save_path']."/".rand(10, 99).date("YmdHis").".".$file_ext;
+
+    if(move_uploaded_file($temp_file,$img_path)){
+        $is_upload = true;
+    } else {
+        $msg = "上传失败";
+    }
+} 
+```
+
+这一关的逻辑跟第12关是一样的，只是save_path的值是通过POST的方式传递的。
+
+GET请求中save_path的值在URL中，用ascii码00截断要进行URL编码，用%00表示。
+
+同样，在POST请求中，也需要对ascii码00进行处理。
+
+2.截断绕过
+
+BurpSuite抓包找到save_path参数的位置。
+
+![alt text](/images/image-16.png)
+
+POST传递参数时，不需要使用URL编码，可以直接使用十六进制00表示ascii码0，接下来构造截断路径../upload/shell.php00，此处的00不能手动输入，而是使用占位符预留位置，然后把占位符的十六进制值改成00。
+
+这里使用#做占位符，然后修改其十六进制值。
+
+![alt text](/images/image-17.png)
+
+切换到Hex窗口，找到#对应的十六进制值23，然后把23改成00，十六进制的00对应的是表示字符串结束的空字符，不会有内容显示。
+
+![alt text](/images/image-18.png)
+
+![alt text](/images/image-19.png)
+
+放行数据包，复制图片链接，删除链接中shell.php后面的内容，访问测试文件上传是否成功。
+
+![alt text](/images/image-20.png)
+
+3.中国蚁剑连接
 
