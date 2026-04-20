@@ -218,6 +218,93 @@ auto_prepend_file = shell.jpg
 
 在upload文件夹下靶场放置了一个readme.php文件，访问readme.php文件，readme.php文件则会把shell.jpg文件中的一句话木马包含进去一起执行。
 
-![alt text](../../static/images/image-11.png)
+![alt text](/images/image-11.png)
+
 
 5.中国蚁剑连接
+
+# 第6关
+
+1.分析核心源代码
+
+```php
+ $deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml",".pht",".pHp",".pHp5",".pHp4",".pHp3",".pHp2",".Html",".Htm",".pHtml",".jsp",".jspa",".jspx",".jsw",".jsv",".jspf",".jtml",".jSp",".jSpx",".jSpa",".jSw",".jSv",".jSpf",".jHtml",".asp",".aspx",".asa",".asax",".ascx",".ashx",".asmx",".cer",".aSp",".aSpx",".aSa",".aSax",".aScx",".aShx",".aSmx",".cEr",".sWf",".swf",".htaccess",".ini");
+    $file_name = trim($_FILES['upload_file']['name']);
+    $file_name = deldot($file_name);//删除文件名末尾的点
+    $file_ext = strrchr($file_name, '.');
+    #$file_ext = strtolower($file_ext); //转换为小写
+    $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+    $file_ext = trim($file_ext); //首尾去空
+```
+
+对照第4关的源代码发现，本关在后缀处理时没有将后缀转换成小写，因此可以使用大小写绕过，使大小写组成的后缀不在黑名单中。
+
+2.将shell.php改成shell.PhP，长传。
+
+3.上传成功后蚁剑连接。
+
+# 第7关
+
+1.分析核心源代码
+
+```php
+$deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml",".pht",".pHp",".pHp5",".pHp4",".pHp3",".pHp2",".Html",".Htm",".pHtml",".jsp",".jspa",".jspx",".jsw",".jsv",".jspf",".jtml",".jSp",".jSpx",".jSpa",".jSw",".jSv",".jSpf",".jHtml",".asp",".aspx",".asa",".asax",".ascx",".ashx",".asmx",".cer",".aSp",".aSpx",".aSa",".aSax",".aScx",".aShx",".aSmx",".cEr",".sWf",".swf",".htaccess",".ini");
+    #$file_name = trim($_FILES['upload_file']['name']);
+    $file_name = $_FILES['upload_file']['name'];
+    $file_name = deldot($file_name);//删除文件名末尾的点
+    $file_ext = strrchr($file_name, '.');
+    $file_ext = strtolower($file_ext); //转换为小写
+    $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+    #$file_ext = trim($file_ext); //首尾去空
+```
+本关在处理后缀时没有删掉文件末尾的空格，可以使用BurpSuite抓包，在文件名末尾增加空格，然后上传文件，服务器会自动将空格删除掉。
+
+2.BurpSuite抓包改后缀，在文件名后加一个空格，上传文件。
+
+3.中国蚁剑连接
+
+# 第8关
+
+1.分析核心源代码
+
+```php
+$deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml",".pht",".pHp",".pHp5",".pHp4",".pHp3",".pHp2",".Html",".Htm",".pHtml",".jsp",".jspa",".jspx",".jsw",".jsv",".jspf",".jtml",".jSp",".jSpx",".jSpa",".jSw",".jSv",".jSpf",".jHtml",".asp",".aspx",".asa",".asax",".ascx",".ashx",".asmx",".cer",".aSp",".aSpx",".aSa",".aSax",".aScx",".aShx",".aSmx",".cEr",".sWf",".swf",".htaccess",".ini");
+    $file_name = trim($_FILES['upload_file']['name']);
+    #$file_name = deldot($file_name);//删除文件名末尾的点
+    $file_ext = strrchr($file_name, '.');
+    $file_ext = strtolower($file_ext); //转换为小写
+    $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+    $file_ext = trim($file_ext); //首尾去空
+```
+本关在处理后缀名称的时候，没有删除文件名末尾的点（.），可以使用BurpSuite抓包，在文件名末尾增加点，然后上传文件，服务器会自动将点删除掉。
+
+2.BurpSuite抓包改后缀，在文件名后加一个点，上传文件。
+
+3.中国蚁剑连接
+
+# 第9题
+
+1.分析核心源代码
+
+```php
+ $deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml",".pht",".pHp",".pHp5",".pHp4",".pHp3",".pHp2",".Html",".Htm",".pHtml",".jsp",".jspa",".jspx",".jsw",".jsv",".jspf",".jtml",".jSp",".jSpx",".jSpa",".jSw",".jSv",".jSpf",".jHtml",".asp",".aspx",".asa",".asax",".ascx",".ashx",".asmx",".cer",".aSp",".aSpx",".aSa",".aSax",".aScx",".aShx",".aSmx",".cEr",".sWf",".swf",".htaccess",".ini");
+    $file_name = trim($_FILES['upload_file']['name']);
+    $file_name = deldot($file_name);//删除文件名末尾的点
+    $file_ext = strrchr($file_name, '.');
+    $file_ext = strtolower($file_ext); //转换为小写
+    #$file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+    $file_ext = trim($file_ext); //首尾去空
+```
+本关在处理后缀名称的时候，没有删除文件名末尾的::$DATA，可以使用BurpSuite抓包，在文件名末尾增加::$DATA，然后上传文件，服务器会自动将::$DATA删除掉。
+
+>::$DATA 是 Windows NTFS 文件系统 中一个特殊的备用数据流（Alternate Data Stream, ADS） 语法，每个 NTFS 文件都有一个主数据流（未命名），其完整名称为 文件名::$DATA。仅适用于 Windows + NTFS 文件系统。
+
+2.BurpSuite抓包改后缀，在文件名后加一个::$DATA，上传文件。
+
+3.中国蚁剑连接
+
+中国蚁剑在填写访问路径时，要将文件末尾的::$DATA删除掉。
+
+# 第10关
+
+
