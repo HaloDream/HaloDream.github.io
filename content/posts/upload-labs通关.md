@@ -218,4 +218,6 @@ auto_prepend_file = shell.jpg
 
 在upload文件夹下靶场放置了一个readme.php文件，访问readme.php文件，readme.php文件则会把shell.jpg文件中的一句话木马包含进去一起执行。
 
+![alt text](../../static/images/image-11.png)
+
 5.中国蚁剑连接
