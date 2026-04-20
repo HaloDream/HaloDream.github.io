@@ -307,4 +307,55 @@ $deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml"
 
 # 第10关
 
+1.分析核心源代码
+
+```php
+ $deny_ext = array(".php",".php5",".php4",".php3",".php2",".html",".htm",".phtml",".pht",".pHp",".pHp5",".pHp4",".pHp3",".pHp2",".Html",".Htm",".pHtml",".jsp",".jspa",".jspx",".jsw",".jsv",".jspf",".jtml",".jSp",".jSpx",".jSpa",".jSw",".jSv",".jSpf",".jHtml",".asp",".aspx",".asa",".asax",".ascx",".ashx",".asmx",".cer",".aSp",".aSpx",".aSa",".aSax",".aScx",".aShx",".aSmx",".cEr",".sWf",".swf",".htaccess",".ini");
+    $file_name = trim($_FILES['upload_file']['name']);
+    $file_name = deldot($file_name);//删除文件名末尾的点
+    $file_ext = strrchr($file_name, '.');
+    $file_ext = strtolower($file_ext); //转换为小写
+    $file_ext = str_ireplace('::$DATA', '', $file_ext);//去除字符串::$DATA
+    $file_ext = trim($file_ext); //首尾去空
+```
+
+这一关包含了后缀处理的所有步骤，需要从处理逻辑上寻找突破点。通过分析后缀处理的顺序，可以发现代码删除文件末尾点和空格的顺序是：空格、点、空格；我们可以在后缀后面有规律的添加点和空格，构造一个新的后缀，使代码按照上述顺序删除后仍然剩余一个点或者空格，实现对黑名单的绕过。
+
+2.BurpSuite抓包改后缀，在文件名后加：点、空格、点，上传文件。
+
+比如shell.php改为shell.php._.（其中下划线代表空格）。
+代码处理时：
+
+（1）删除末尾空格，因为末尾没有空格，所以不会有变化；
+
+（2）删除末尾的点，此时shell.php.\_.变成了 shell.php._
+
+（3）删除末尾空格，此时shell.php.\_.变成了 shell.php.
+
+最终的文件名称为shell.php. ，后缀为.php. ，不在黑名单中，成功绕过黑名单上传。
+
+3.中国蚁剑连接
+
+# 第11关
+
+1.分析核心源代码
+
+```php
+ $deny_ext = array("php","php5","php4","php3","php2","html","htm","phtml","pht","jsp","jspa","jspx","jsw","jsv","jspf","jtml","asp","aspx","asa","asax","ascx","ashx","asmx","cer","swf","htaccess","ini");
+
+    $file_name = trim($_FILES['upload_file']['name']);
+    $file_name = str_ireplace($deny_ext,"", $file_name);
+    $temp_file = $_FILES['upload_file']['tmp_name'];
+    $img_path = UPLOAD_PATH.'/'.$file_name;        
+```
+
+这一关的重点在于 【 $file_name = str_ireplace($deny_ext,"", $file_name); 】，把黑名单中的后缀以替换的方式删除掉，后面的代码没有对删除后的后缀再次验证，这样我们就可以直接使用双写绕过。
+
+2.BurpSuite抓包改后缀，把shell.php改成shell.pphphp
+
+shell.pphphp被删除掉后缀中的php组合后，shell.p~~php~~hp剩下的内容又可以拼接成shell.php。
+
+3.中国蚁剑连接
+
+# 第12关
 
