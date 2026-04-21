@@ -1,6 +1,6 @@
 +++
 date = '2026-04-21T15:29:15Z'
-draft = flase
+draft = false
 title = 'PHP伪协议'
 categories = ["基础知识"]
 tags = ["PHP", "伪协议", "文件包含"]
