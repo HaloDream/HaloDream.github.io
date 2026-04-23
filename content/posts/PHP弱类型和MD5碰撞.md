@@ -70,9 +70,9 @@ $allow = [0, 1, 2];
 
 |场景	|payload|
 |--|--|
-|md5($a) == md5($b)	    |a[]=1&b[]=2
-|md5($a) === md5($b)    |同上（NULL === NULL 为真）
-|sha1($a) == sha1($b)	|a[]=1&b[]=2
+|md5($a) == md5($b)	    |a[]=1&b[]=2|
+|md5($a) === md5($b)    |同上（NULL === NULL 为真）|
+|sha1($a) == sha1($b)	|a[]=1&b[]=2|
 
 注意：PHP 会报 Warning，但不影响结果。
 
